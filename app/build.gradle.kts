@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id ("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -57,6 +59,20 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    //navigation
     implementation (libs.androidx.navigation.compose)
+    //roomDateBase
+    implementation (libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    //viewModel
+    implementation(
+        libs.androidx.lifecycle.viewmodel.ktx)
+    //compose scope
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
+
+
+
+
 
 }
