@@ -1,8 +1,6 @@
 package com.sk.precticecomposeui.screens
 
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.clickable
+import android.graphics.Paint.Align
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +14,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,16 +33,14 @@ import androidx.navigation.compose.rememberNavController
 import com.sk.precticecomposeui.roomdb.AppDatabase
 import com.sk.precticecomposeui.roomdb.LoginUser
 import com.sk.precticecomposeui.roomdb.mvvm.LoginRepo
-import com.sk.precticecomposeui.roomdb.mvvm.LoginState
 import com.sk.precticecomposeui.roomdb.mvvm.LoginViewModel
 import com.sk.precticecomposeui.roomdb.mvvm.ViewModelFactory
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun LoginScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController) {
     Surface(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             var userName by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var showToast by remember { mutableStateOf(false) }
@@ -56,21 +51,16 @@ fun LoginScreen(navController: NavController) {
             val factory = remember { ViewModelFactory(repo) }
             val viewModel: LoginViewModel = viewModel(factory = factory)
             val coroutineScope = rememberCoroutineScope()
-
-            // Collecting login state
-            val loginState by viewModel.loginState.collectAsState()
-            val userList by viewModel.userList.collectAsState()
-            Log.d("TAG", "LoginScreen: $userList")
-
             Column(modifier = Modifier) {
                 Text(
-                    text = "Login",
+                    text = "Sign Up",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
+
                 )
                 Spacer(modifier = Modifier.heightIn(20.dp))
 
@@ -86,8 +76,6 @@ fun LoginScreen(navController: NavController) {
                         .padding(horizontal = 16.dp)
                         .align(Alignment.CenterHorizontally)
                 )
-
-
                 Spacer(modifier = Modifier.heightIn(20.dp))
 
                 OutlinedTextField(
@@ -117,65 +105,34 @@ fun LoginScreen(navController: NavController) {
                             toastMessage = "enter the valid password"
                             showToast = true
                         } else {
+                            val userLogin = LoginUser(userName = userName, password = password)
                             coroutineScope.launch {
-                                viewModel.login(userName, password) // Call ViewModel's login function
-                            }
+                                try {
+                                    viewModel.loginInsert(userLogin)
+                                    showToast = true
+                                    toastMessage = "Sign Up Successfully"
+                                    navController.navigate("LoginScreen")
 
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    showToast = true
+                                    toastMessage = "Something went wrong"
+                                }
+                            }
                         }
                     }) {
                     Text(text = "Submit")
 
                 }
-                // Observe the login state
-                when (loginState) {
-                    is LoginState.Success -> {
-                        toastMessage = "Login Successful"
-                        showToast = true
-                        navController.navigate("HomeScreen") // Navigate to the next screen
-                        viewModel.resetLoginState() // Reset the state
-
-                    }
-                    is LoginState.Error -> {
-                        toastMessage = (loginState as LoginState.Error).message
-                        showToast = true
-                        viewModel.resetLoginState() // Reset the state
-
-                    }
-
-                    else -> {
-                        // No action needed
-                    }
-                }
-                Spacer(modifier = Modifier.heightIn(10.dp))
-                Text(
-                    text = "Dont have an account SignUp!",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp).clickable {
-                            navController.navigate("SignUpScreen")
-                        },
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-
-                )
-                if (showToast) {
-                    Toast.makeText(LocalContext.current, toastMessage, Toast.LENGTH_SHORT).show()
-                    showToast = false
-                }
-
             }
-
 
         }
 
     }
-
 }
-
 
 @Preview
 @Composable
-fun LoginScreenPReview() {
-    LoginScreen(navController = rememberNavController())
+fun SignUpScreenPreview() {
+    SignUpScreen(navController = rememberNavController())
 }

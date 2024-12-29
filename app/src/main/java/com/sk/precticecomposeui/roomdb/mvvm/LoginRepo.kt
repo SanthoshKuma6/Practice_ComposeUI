@@ -9,4 +9,12 @@ class LoginRepo(val appDatabase: AppDatabase) {
     suspend fun getUser(userName: String, password: String): LoginUser? {
         return appDatabase.userDao().getUser(userName, password)
     }
+
+
+
+    suspend fun getAllUsers(): List<LoginUser> {
+        return appDatabase.userDao().getAllUsers()
+    }
+
+
 }

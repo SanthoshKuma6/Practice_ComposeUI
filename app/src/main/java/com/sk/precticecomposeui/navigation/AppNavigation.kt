@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sk.precticecomposeui.screens.HomeScreen
 import com.sk.precticecomposeui.screens.LoginScreen
+import com.sk.precticecomposeui.screens.SignUpScreen
 
 @Composable
 fun AppNavigation() {
@@ -15,9 +16,13 @@ fun AppNavigation() {
         composable("LoginScreen") {
             LoginScreen(navController)
         }
-        composable("HomeScreen") {
-            HomeScreen()
+        composable("SignUpScreen"){
+            SignUpScreen(navController)
         }
+        composable("HomeScreen") {
+            HomeScreen(navController)
+        }
+
     }
 
 }

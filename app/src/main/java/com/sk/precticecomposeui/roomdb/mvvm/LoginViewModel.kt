@@ -23,20 +23,34 @@ class LoginViewModel(private val repo: LoginRepo) : ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
 
+    private val _userList=MutableStateFlow<List<LoginUser>>(emptyList())
+    val userList:StateFlow<List<LoginUser>> get() = _userList
     fun login(userName: String, password: String) {
         viewModelScope.launch {
+            Log.d("TAG", "Attempting login with username: $userName, password: $password")
+
             val user = repo.getUser(userName, password)
-            Log.d("TAG", "login: $user")
+
             if (user != null) {
                 _loginState.value = LoginState.Success
-                Log.d("TAG","Login Success")
+                Log.d("TAG", "Login successful for username: $userName")
             } else {
-                Log.d("TAG", "login Invalide")
+                Log.d("TAG", "User not found in database for username: $userName")
                 _loginState.value = LoginState.Error("Invalid username or password")
             }
         }
     }
 
+    fun resetLoginState() {
+        _loginState.value = LoginState.Idle
+    }
+
+    // Function to fetch all users
+    fun fetchUsers() {
+        viewModelScope.launch {
+            _userList.value = repo.getAllUsers()
+        }
+    }
 }
 
 sealed class LoginState {
